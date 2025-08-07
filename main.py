@@ -1,5 +1,6 @@
 import os
 import time
+import datetime
 
 transactionList = []
 
@@ -90,6 +91,10 @@ def addTransaction():
     tCategory = input("Podaj kategorię transakcji: ")
     clearTerminal()
     tDate = input("Podaj datę transakcji w formacie DD.MM.YY (Jeśli dzisiejsza, kliknij enter): ")
+    if tDate == '':
+        tDate == str(f"{datetime.datetime.now().strftime("%d")}.{datetime.datetime.now().strftime("%m")}.{datetime.datetime.now().strftime("%y")}")
+    print(tDate)
+    time.sleep(3)
     clearTerminal()
     transaction = transactionClass(tDiscription, tSum, tType, tCategory, tDate)
     transactionList.append(transaction)
