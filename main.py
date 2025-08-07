@@ -2,10 +2,11 @@ import os
 import time
 import datetime
 import re
+import json
 
 transactionList = []
 
-class transactionClass:
+class Transaction:
     def __init__(self, discription, sum, type, category, date):
         self.discription = discription
         self.sum = sum
@@ -106,9 +107,10 @@ def addTransaction():
         else:
             wrongAnswer()
     clearTerminal()
-    transaction = transactionClass(tDiscription, tSum, tType, tCategory, tDate)
+    transaction = Transaction(tDiscription, tSum, tType, tCategory, tDate)
     transactionList.append(transaction)
     print(f"Transakcja: {transaction.discription} na kwotę {transaction.sum} została dodana.")
+    transactionsSave()
     time.sleep(3)
 
 
@@ -116,7 +118,7 @@ def transactionsHistory():
     clearTerminal()
     print("Historia transakcji: ")
     for obj in transactionList:
-        print(f"- {obj.discription} | {obj.sum} | {obj.type} | {obj.category} | {obj.date}")
+        print(f"{obj.discription} | {obj.sum} | {obj.type} | {obj.category} | {obj.date}")
     input("Aby wyjść, naciśnij enter: ")
 
 def financeAnalise():
@@ -129,4 +131,17 @@ def exitApp():
     print("Test: Opusc aplikacje")
     time.sleep(2)
 
+def transactionsSave():
+    with open("transactions.json", "w") as file:
+        data = [obj.__dict__ for obj in transactionList]
+        json.dump(data, file, indent=2)
+
+def transactionsRead():
+    global transactionList
+    if os.path.exists("transactions.json") == True:
+        with open("transactions.json", "r") as file:
+            data = json.load(file)
+        transactionList = [Transaction(**item) for item in data]
+
+transactionsRead()
 mainMenu()
