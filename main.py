@@ -43,7 +43,7 @@ def mainMenu():
         if mainMenuChoiceInt == 1:
             addTransaction()
         elif mainMenuChoiceInt == 2:
-            transactionHistory()
+            transactionsHistory()
         elif mainMenuChoiceInt == 3:
             financeAnalise()
         elif mainMenuChoiceInt == 4:
@@ -112,10 +112,12 @@ def addTransaction():
     time.sleep(3)
 
 
-def transactionHistory():
+def transactionsHistory():
     clearTerminal()
-    print("Test: Historia transakcji")
-    time.sleep(2)
+    print("Historia transakcji: ")
+    for obj in transactionList:
+        print(f"- {obj.discription} | {obj.sum} | {obj.type} | {obj.category} | {obj.date}")
+    input("Aby wyjść, naciśnij enter: ")
 
 def financeAnalise():
     clearTerminal()
