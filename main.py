@@ -43,9 +43,14 @@ def wrongAnswer():
     time.sleep(2)
 
 def addTransaction():
-    clearTerminal()
-    print("Test: dodawanie transakcji")
-    time.sleep(2)
+    while True:
+        clearTerminal()
+        tSum = input("Podaj kwotę transakcji (W formacie X.XX): ")
+        try:
+            tSumAsFloat = float(tSum)
+        except:
+            wrongAnswer()
+        tSumAsString = str(tSum)
 
 def transactionHistory():
     clearTerminal()
