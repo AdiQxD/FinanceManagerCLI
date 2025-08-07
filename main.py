@@ -1,6 +1,14 @@
 import os
 import time
 
+class transaction:
+    def __init__(self, description, sum, type, category, date):
+        self.description = None
+        self.sum = None
+        self.type = None
+        self.category = None
+        self.date = None
+
 def clearTerminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
