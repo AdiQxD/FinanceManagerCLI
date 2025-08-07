@@ -1,6 +1,7 @@
 import os
 import time
 import datetime
+import re
 
 transactionList = []
 
@@ -12,11 +13,16 @@ class transactionClass:
         self.category = category
         self.date = date
 
-def isCorrect(x):
+def decimalCount(x):
     xStr = str(x)
     if '.' not in xStr:
         return 0 
     return len(xStr.split('.')[1])
+
+def dateFormatCheck(x):
+    pattern = r"\d{2}.\d{2}.\d{2}"
+    return re.fullmatch(pattern, x) is not None
+    
 
 def clearTerminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -80,7 +86,7 @@ def addTransaction():
             wrongAnswer()
             continue
 
-        if isCorrect(tSumAsFloat) > 2:
+        if decimalCount(tSumAsFloat) > 2:
             wrongAnswer()
         else:
             tSum = tSumAsFloat
@@ -90,11 +96,15 @@ def addTransaction():
     clearTerminal()
     tCategory = input("Podaj kategorię transakcji: ")
     clearTerminal()
-    tDate = input("Podaj datę transakcji w formacie DD.MM.YY (Jeśli dzisiejsza, kliknij enter): ")
-    if tDate == '':
-        tDate == str(f"{datetime.datetime.now().strftime("%d")}.{datetime.datetime.now().strftime("%m")}.{datetime.datetime.now().strftime("%y")}")
-    print(tDate)
-    time.sleep(3)
+    while True:
+        tDate = input("Podaj datę transakcji w formacie DD.MM.YY (Jeśli dzisiejsza, kliknij enter): ")
+        if tDate == '':
+            tDate = str(f"{datetime.datetime.now().strftime('%d')}.{datetime.datetime.now().strftime('%m')}.{datetime.datetime.now().strftime('%y')}")
+            break
+        elif dateFormatCheck(tDate) == True:
+            break
+        else:
+            wrongAnswer()
     clearTerminal()
     transaction = transactionClass(tDiscription, tSum, tType, tCategory, tDate)
     transactionList.append(transaction)
