@@ -1,13 +1,21 @@
 import os
 import time
 
-class transaction:
-    def __init__(self, description, sum, type, category, date):
-        self.description = None
-        self.sum = None
-        self.type = None
-        self.category = None
-        self.date = None
+transactionList = []
+
+class transactionClass:
+    def __init__(self, discription, sum, type, category, date):
+        self.discription = discription
+        self.sum = sum
+        self.type = type
+        self.category = category
+        self.date = date
+
+def isCorrect(x):
+    xStr = str(x)
+    if '.' not in xStr:
+        return 0 
+    return len(xStr.split('.')[1])
 
 def clearTerminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -45,12 +53,49 @@ def wrongAnswer():
 def addTransaction():
     while True:
         clearTerminal()
+        tType = input("Podaj typ transakcji\n" \
+                        "1. Przychód\n" \
+                        "2. Wydatek\n\n" \
+                        "Twój wybór: ")
+        try:
+            tTypeAsInt = int(tType)
+        except:
+            wrongAnswer()
+            continue
+        if tTypeAsInt == 1:
+            tType = "Przychód"
+            break
+        elif tTypeAsInt == 2:
+            tType = "Wydatek"
+            break
+        else:
+            wrongAnswer()
+    while True:
+        clearTerminal()
         tSum = input("Podaj kwotę transakcji (W formacie X.XX): ")
         try:
             tSumAsFloat = float(tSum)
         except:
             wrongAnswer()
-        tSumAsString = str(tSum)
+            continue
+
+        if isCorrect(tSumAsFloat) > 2:
+            wrongAnswer()
+        else:
+            tSum = tSumAsFloat
+            break
+    clearTerminal()
+    tDiscription = input("Podaj opis transakcji: ")
+    clearTerminal()
+    tCategory = input("Podaj kategorię transakcji: ")
+    clearTerminal()
+    tDate = input("Podaj datę transakcji w formacie DD.MM.YY (Jeśli dzisiejsza, kliknij enter): ")
+    clearTerminal()
+    transaction = transactionClass(tDiscription, tSum, tType, tCategory, tDate)
+    transactionList.append(transaction)
+    print(f"Transakcja: {transaction.discription} na kwotę {transaction.sum} została dodana.")
+    time.sleep(3)
+
 
 def transactionHistory():
     clearTerminal()
