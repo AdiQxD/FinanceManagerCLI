@@ -4,12 +4,10 @@ import datetime
 import re
 import json
 
-transactionList = []
-
 class Transaction:
-    def __init__(self, discription, sum, type, category, date):
+    def __init__(self, discription, amount, type, category, date):
         self.discription = discription
-        self.sum = sum
+        self.amount = amount
         self.type = type
         self.category = category
         self.date = date
@@ -17,18 +15,18 @@ class Transaction:
 class FinanceManager:
     def __init__(self):
         self.transactions = []
-        self.loadTransactions()
+        self.load_transactions()
     
-    def addTransaction(self, transaction):
+    def add_transaction(self, transaction):
         self.transactions.append(transaction)
-        self.saveTransaction()
+        self.save_transactions()
 
-    def saveTransaction(self):
+    def save_transactions(self):
         with open("transactions.json", "w") as file:
             data = [obj.__dict__ for obj in self.transactions]
             json.dump(data, file, indent=2)
 
-    def loadTransactions(self):
+    def load_transactions(self):
         if os.path.exists("transactions.json"):
             try:
                 with open("transactions.json", "r") as file:
@@ -38,70 +36,70 @@ class FinanceManager:
                 print("Błąd podczas wczytywania pliku JSON.")
                 self.transactions = []
 
-    def showTransactionHistory(self):
+    def give_transaction_history(self):
         for obj in self.transactions:
-            print(f"{obj.discription} | {obj.sum} | {obj.type} | {obj.category} | {obj.date}")
+            print(f"{obj.discription} | {obj.amount} | {obj.type} | {obj.category} | {obj.date}")
 
-    def transactionAnalise(self):
-        incomeSum = 0
-        expenseSum = 0
+    def give_financial_analysis(self):
+        income_amount = 0
+        expense_amount = 0
         balance = 0
         for obj in self.transactions:
             if obj.type == "Przychód":
-                incomeSum =+ obj.sum
+                income_amount += obj.amount
             elif obj.type == "Wydatek":
-                expenseSum =+ obj.sum
-        balance = incomeSum - expenseSum
-        print(f"Suma przychodów: {incomeSum}\nSuma wydatków: {expenseSum}\nSaldo: {balance}")
+                expense_amount += obj.amount
+        balance = income_amount - expense_amount
+        print(f"Suma przychodów: {income_amount}\nSuma wydatków: {expense_amount}\nSaldo: {balance}")
                 
         
-def decimalCount(x):
-    xStr = str(x)
-    if '.' not in xStr:
+def count_decimal_digits(x):
+    amount_as_string = str(x)
+    if '.' not in amount_as_string:
         return 0 
-    return len(xStr.split('.')[1])
+    return len(amount_as_string.split('.')[1])
 
-def dateFormatCheck(x):
+def check_date_format(x):
     pattern = r"\d{2}.\d{2}.\d{2}"
     return re.fullmatch(pattern, x) is not None
     
-def clearTerminal():
+def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def mainMenu():
+def display_main_menu():
     while True:
-        clearTerminal()
-        mainMenuChoice = input("Menadzer finansów CLI\n" \
+        clear_terminal()
+        main_menu_choice = input("Menadzer finansów CLI\n" \
                             "1. Dodaj transakcję\n" \
                             "2. Historia transakcji\n" \
                             "3. Analiza salda\n" \
                             "4. Wyjście\n\n" \
                             "Twój wybór: ")
         try:
-            mainMenuChoiceInt = int(mainMenuChoice)
+            main_menu_choice_as_int = int(main_menu_choice)
         except:
-            wrongAnswer()
+            display_wrong_answer()
             continue
-        if mainMenuChoiceInt == 1:
-            addTransaction()
-        elif mainMenuChoiceInt == 2:
-            transactionsHistory()
-        elif mainMenuChoiceInt == 3:
-            financeAnalise()
-        elif mainMenuChoiceInt == 4:
-            exitApp()
+        if main_menu_choice_as_int == 1:
+            display_add_transaction()
+        elif main_menu_choice_as_int == 2:
+            display_transaction_history()
+        elif main_menu_choice_as_int == 3:
+            display_finance_analysis()
+        elif main_menu_choice_as_int == 4:
+            exit_app()
             break
         else:
-            wrongAnswer()
+            display_wrong_answer()
     
-def wrongAnswer():
-    clearTerminal()
+def display_wrong_answer():
+    clear_terminal()
     print("Błędny Wybór")
     time.sleep(2)
 
-def addTransaction():
+def display_add_transaction():
     while True:
-        clearTerminal()
+        clear_terminal()
         tType = input("Podaj typ transakcji\n" \
                         "1. Przychód\n" \
                         "2. Wydatek\n\n" \
@@ -109,7 +107,7 @@ def addTransaction():
         try:
             tTypeAsInt = int(tType)
         except:
-            wrongAnswer()
+            display_wrong_answer()
             continue
         if tTypeAsInt == 1:
             tType = "Przychód"
@@ -118,60 +116,60 @@ def addTransaction():
             tType = "Wydatek"
             break
         else:
-            wrongAnswer()
+            display_wrong_answer()
     while True:
-        clearTerminal()
-        tSum = input("Podaj kwotę transakcji (W formacie X.XX): ")
+        clear_terminal()
+        amount = input("Podaj kwotę transakcji (W formacie X.XX): ")
         try:
-            tSumAsFloat = float(tSum)
+            amountAsFloat = float(amount)
         except:
-            wrongAnswer()
+            display_wrong_answer()
             continue
 
-        if decimalCount(tSumAsFloat) > 2:
-            wrongAnswer()
+        if count_decimal_digits(amountAsFloat) > 2:
+            display_wrong_answer()
         else:
-            tSum = tSumAsFloat
+            amount = amountAsFloat
             break
-    clearTerminal()
+    clear_terminal()
     tDiscription = input("Podaj opis transakcji: ")
-    clearTerminal()
+    clear_terminal()
     tCategory = input("Podaj kategorię transakcji: ")
-    clearTerminal()
+    clear_terminal()
     while True:
         tDate = input("Podaj datę transakcji w formacie DD.MM.YY (Jeśli dzisiejsza, kliknij enter): ")
         if tDate == '':
             tDate = str(f"{datetime.datetime.now().strftime('%d')}.{datetime.datetime.now().strftime('%m')}.{datetime.datetime.now().strftime('%y')}")
             break
-        elif dateFormatCheck(tDate) == True:
+        elif check_date_format(tDate) == True:
             break
         else:
-            wrongAnswer()
-    clearTerminal()
-    transaction = Transaction(tDiscription, tSum, tType, tCategory, tDate)
-    manager.addTransaction(transaction)
-    print(f"Transakcja: {transaction.discription} na kwotę {transaction.sum} została dodana.")
+            display_wrong_answer()
+    clear_terminal()
+    transaction = Transaction(tDiscription, amount, tType, tCategory, tDate)
+    manager.add_transaction(transaction)
+    print(f"Transakcja: {transaction.discription} na kwotę {transaction.amount} została dodana.")
     time.sleep(3)
 
-def transactionsHistory():
-    clearTerminal()
+def display_transaction_history():
+    clear_terminal()
     print("Historia transakcji: ")
-    manager.showTransactionHistory()
+    manager.give_transaction_history()
     input("Aby wyjść, naciśnij enter: ")
 
-def financeAnalise():
-    clearTerminal()
+def display_finance_analysis():
+    clear_terminal()
     print("Analiza finansów: ")
-    manager.transactionAnalise()
+    manager.give_financial_analysis()
     input("Aby wyjść, naciśnij enter: ")    
 
-def exitApp():
-    clearTerminal()
+def exit_app():
+    clear_terminal()
     print("Opuszczanie aplikacji.\nZapisywanie danych.")
-    manager.saveTransaction()
+    manager.save_transactions()
     time.sleep(2)
 
 manager = FinanceManager()
-mainMenu()
+display_main_menu()
 
 
