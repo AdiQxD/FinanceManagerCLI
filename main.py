@@ -41,6 +41,7 @@ def mainMenu():
             mainMenuChoiceInt = int(mainMenuChoice)
         except:
             wrongAnswer()
+            continue
         if mainMenuChoiceInt == 1:
             addTransaction()
         elif mainMenuChoiceInt == 2:
@@ -129,6 +130,7 @@ def financeAnalise():
 def exitApp():
     clearTerminal()
     print("Test: Opusc aplikacje")
+    transactionsSave()
     time.sleep(2)
 
 def transactionsSave():
