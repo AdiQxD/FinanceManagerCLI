@@ -14,6 +14,32 @@ class Transaction:
         self.category = category
         self.date = date
 
+class FinanceManager:
+    def __init__(self):
+        self.transactions = []
+        self.loadTransactions()
+    
+    def addTransaction(self, transaction):
+        self.transactions.append(transaction)
+        self.saveTransaction()
+
+    def saveTransaction(self):
+        with open("transactions.json", "w") as file:
+            data = [obj.__dict__ for obj in self.transactions]
+            json.dump(data, file, indent=2)
+
+    def loadTransactions(self):
+        with open("transactions.json", "r") as file:
+            data = json.load(file)
+            self.transactions = [Transaction(**item) for item in data]
+
+    def showTransactionHistory(self):
+        for obj in self.transactions:
+            print(f"{obj.discription} | {obj.sum} | {obj.type} | {obj.category} | {obj.date}")
+
+    def transactionAnalise(self):
+        print("Test: Analiza")
+        
 def decimalCount(x):
     xStr = str(x)
     if '.' not in xStr:
@@ -24,7 +50,6 @@ def dateFormatCheck(x):
     pattern = r"\d{2}.\d{2}.\d{2}"
     return re.fullmatch(pattern, x) is not None
     
-
 def clearTerminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -109,41 +134,29 @@ def addTransaction():
             wrongAnswer()
     clearTerminal()
     transaction = Transaction(tDiscription, tSum, tType, tCategory, tDate)
-    transactionList.append(transaction)
+    manager.addTransaction(transaction)
     print(f"Transakcja: {transaction.discription} na kwotę {transaction.sum} została dodana.")
-    transactionsSave()
     time.sleep(3)
-
 
 def transactionsHistory():
     clearTerminal()
     print("Historia transakcji: ")
-    for obj in transactionList:
-        print(f"{obj.discription} | {obj.sum} | {obj.type} | {obj.category} | {obj.date}")
+    manager.showTransactionHistory()
     input("Aby wyjść, naciśnij enter: ")
 
 def financeAnalise():
     clearTerminal()
-    print("Test: Analiza")
+    manager.transactionAnalise()
     time.sleep(2)
 
 def exitApp():
     clearTerminal()
     print("Test: Opusc aplikacje")
-    transactionsSave()
+    manager.saveTransaction()
     time.sleep(2)
 
-def transactionsSave():
-    with open("transactions.json", "w") as file:
-        data = [obj.__dict__ for obj in transactionList]
-        json.dump(data, file, indent=2)
-
-def transactionsRead():
-    global transactionList
-    if os.path.exists("transactions.json") == True:
-        with open("transactions.json", "r") as file:
-            data = json.load(file)
-        transactionList = [Transaction(**item) for item in data]
-
-transactionsRead()
+manager = FinanceManager()
+manager.loadTransactions()
 mainMenu()
+
+
