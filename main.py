@@ -29,16 +29,31 @@ class FinanceManager:
             json.dump(data, file, indent=2)
 
     def loadTransactions(self):
-        with open("transactions.json", "r") as file:
-            data = json.load(file)
-            self.transactions = [Transaction(**item) for item in data]
+        if os.path.exists("transactions.json"):
+            try:
+                with open("transactions.json", "r") as file:
+                    data = json.load(file)
+                    self.transactions = [Transaction(**item) for item in data]
+            except json.JSONDecodeError:
+                print("Błąd podczas wczytywania pliku JSON.")
+                self.transactions = []
 
     def showTransactionHistory(self):
         for obj in self.transactions:
             print(f"{obj.discription} | {obj.sum} | {obj.type} | {obj.category} | {obj.date}")
 
     def transactionAnalise(self):
-        print("Test: Analiza")
+        incomeSum = 0
+        expenseSum = 0
+        balance = 0
+        for obj in self.transactions:
+            if obj.type == "Przychód":
+                incomeSum =+ obj.sum
+            elif obj.type == "Wydatek":
+                expenseSum =+ obj.sum
+        balance = incomeSum - expenseSum
+        print(f"Suma przychodów: {incomeSum}\nSuma wydatków: {expenseSum}\nSaldo: {balance}")
+                
         
 def decimalCount(x):
     xStr = str(x)
@@ -146,17 +161,17 @@ def transactionsHistory():
 
 def financeAnalise():
     clearTerminal()
+    print("Analiza finansów: ")
     manager.transactionAnalise()
-    time.sleep(2)
+    input("Aby wyjść, naciśnij enter: ")    
 
 def exitApp():
     clearTerminal()
-    print("Test: Opusc aplikacje")
+    print("Opuszczanie aplikacji.\nZapisywanie danych.")
     manager.saveTransaction()
     time.sleep(2)
 
 manager = FinanceManager()
-manager.loadTransactions()
 mainMenu()
 
 
