@@ -3,10 +3,11 @@ import time
 import datetime
 import re
 import json
+from decimal import Decimal
 
 class Transaction:
-    def __init__(self, discription, amount, type, category, date):
-        self.discription = discription
+    def __init__(self, description, amount, type, category, date):
+        self.description = description
         self.amount = amount
         self.type = type
         self.category = category
@@ -38,7 +39,7 @@ class FinanceManager:
 
     def give_transaction_history(self):
         for obj in self.transactions:
-            print(f"{obj.discription} | {obj.amount} | {obj.type} | {obj.category} | {obj.date}")
+            print(f"{obj.description} | {round(Decimal(obj.amount/100), 2)} | {obj.type} | {obj.category} | {obj.date}")
 
     def give_financial_analysis(self):
         income_amount = 0
@@ -50,14 +51,7 @@ class FinanceManager:
             elif obj.type == "Wydatek":
                 expense_amount += obj.amount
         balance = income_amount - expense_amount
-        print(f"Suma przychodów: {income_amount}\nSuma wydatków: {expense_amount}\nSaldo: {balance}")
-                
-        
-def count_decimal_digits(x):
-    amount_as_string = str(x)
-    if '.' not in amount_as_string:
-        return 0 
-    return len(amount_as_string.split('.')[1])
+        print(f"Suma przychodów: {round(Decimal(income_amount/100), 2)}\nSuma wydatków: {round(Decimal(expense_amount/100), 2)}\nSaldo: {round(Decimal(balance/100), 2)}")
 
 def check_date_format(x):
     pattern = r"\d{2}.\d{2}.\d{2}"
@@ -100,55 +94,51 @@ def display_wrong_answer():
 def display_add_transaction():
     while True:
         clear_terminal()
-        tType = input("Podaj typ transakcji\n" \
+        type = input("Podaj typ transakcji\n" \
                         "1. Przychód\n" \
                         "2. Wydatek\n\n" \
                         "Twój wybór: ")
         try:
-            tTypeAsInt = int(tType)
+            type_as_int = int(type)
         except:
             display_wrong_answer()
             continue
-        if tTypeAsInt == 1:
-            tType = "Przychód"
+        if type_as_int == 1:
+            type = "Przychód"
             break
-        elif tTypeAsInt == 2:
-            tType = "Wydatek"
+        elif type_as_int == 2:
+            type = "Wydatek"
             break
         else:
             display_wrong_answer()
     while True:
         clear_terminal()
-        amount = input("Podaj kwotę transakcji (W formacie X.XX): ")
+        amount = str(input("Podaj kwotę transakcji: "))
         try:
-            amountAsFloat = float(amount)
+            amount = Decimal(amount)
+            amount = int(amount * 100)
+            break
         except:
             display_wrong_answer()
             continue
-
-        if count_decimal_digits(amountAsFloat) > 2:
-            display_wrong_answer()
-        else:
-            amount = amountAsFloat
-            break
     clear_terminal()
-    tDiscription = input("Podaj opis transakcji: ")
+    description = input("Podaj opis transakcji: ")
     clear_terminal()
-    tCategory = input("Podaj kategorię transakcji: ")
+    category = input("Podaj kategorię transakcji: ")
     clear_terminal()
     while True:
-        tDate = input("Podaj datę transakcji w formacie DD.MM.YY (Jeśli dzisiejsza, kliknij enter): ")
-        if tDate == '':
-            tDate = str(f"{datetime.datetime.now().strftime('%d')}.{datetime.datetime.now().strftime('%m')}.{datetime.datetime.now().strftime('%y')}")
+        date = input("Podaj datę transakcji w formacie DD.MM.YY (Jeśli dzisiejsza, kliknij enter): ")
+        if date == '':
+            date = str(f"{datetime.datetime.now().strftime('%d')}.{datetime.datetime.now().strftime('%m')}.{datetime.datetime.now().strftime('%y')}")
             break
-        elif check_date_format(tDate) == True:
+        elif check_date_format(date) == True:
             break
         else:
             display_wrong_answer()
     clear_terminal()
-    transaction = Transaction(tDiscription, amount, tType, tCategory, tDate)
+    transaction = Transaction(description, amount, type, category, date)
     manager.add_transaction(transaction)
-    print(f"Transakcja: {transaction.discription} na kwotę {transaction.amount} została dodana.")
+    print(f"Transakcja: {transaction.description} na kwotę {Decimal(transaction.amount)} została dodana.")
     time.sleep(3)
 
 def display_transaction_history():
