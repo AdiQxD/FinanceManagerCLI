@@ -74,7 +74,6 @@ def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def display_main_menu():
-    while True:
         clear_terminal()
         main_menu_choice = input("Menadzer finansów CLI\n" \
                             "1. Dodaj transakcję\n" \
@@ -82,10 +81,14 @@ def display_main_menu():
                             "3. Analiza salda\n" \
                             "4. Wyjście\n\n" \
                             "Twój wybór: ")
+        return main_menu_choice
+        
+def choose_main_menu():
+    while True:
         try:
-            main_menu_choice_as_int = int(main_menu_choice)
+            main_menu_choice_as_int = int(display_main_menu())
         except ValueError:
-            display_error("Wybrano błędną opcję.")
+            display_error("Wybór musi być liczbą.")
             continue
         if main_menu_choice_as_int == 1:
             display_add_transaction()
@@ -97,7 +100,7 @@ def display_main_menu():
             exit_app()
             break
         else:
-            display_error("Wybrano błędną opcję.")
+            raise ValueError("Wybrana opcja nie istnieje.")
     
 def display_error(text="Błąd bez opisu"):
     clear_terminal()
@@ -119,12 +122,7 @@ def validate_amount(text:str) -> int:
     except ValueError:
         raise ValueError("Kwota moze sie skladac tylko z liczb i separatorów.")
     dec = Decimal(text).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    if dec > 1000:
-        amount_big_value_check = input("Podano duzą liczbę, prosze potwierdzic(tak/nie): ")
-        if amount_big_value_check.lower == "tak":
-            return int(dec*100)
-        elif amount_big_value_check.lower == "nie":
-            raise ValueError("Podano za duzą wartość.")
+    return int(dec*100)
     
 def cents_to_amount(cents: int) -> Decimal:
     return (Decimal(cents).scaleb(-2)).quantize(Decimal("0.00"),rounding=ROUND_HALF_UP)
@@ -154,10 +152,23 @@ def display_add_transaction():
         amount = str(input("Podaj kwotę transakcji: "))
         try:
             amount = validate_amount(amount)
-            break
-        except ValueError as error:
-            display_error(error)
+        except ValueError as e:
+            display_error(str(e))
             continue
+        try:
+            if amount > 100000:
+                amount_big_value_check = input("Podano duzą liczbę, prosze potwierdzic(tak/nie): ")
+                if str(amount_big_value_check.lower()) == "tak":
+                    print(amount_big_value_check)
+                    time.sleep(3)
+                    break
+                elif str(amount_big_value_check.lower()) == "nie":
+                    raise ValueError("Podano za duzą wartość.")
+                else:
+                    raise ValueError("Wybrano błędną opcję.")
+        except ValueError as e:
+            display_error(str(e))
+    
     clear_terminal()
     description = input("Podaj opis transakcji: ")
     clear_terminal()
@@ -195,6 +206,6 @@ def exit_app():
     time.sleep(2)
 
 manager = FinanceManager()
-display_main_menu()
+choose_main_menu()
 
 
