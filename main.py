@@ -105,11 +105,26 @@ def display_error(text="Błąd bez opisu"):
     print(f"Opis: {text}")
     time.sleep(2)
 
-def amount_to_cents(text:str) -> int:
-    text = text.replace(" ", "")
+def validate_amount(text:str) -> int:
+    if "-" in text:
+        raise ValueError("Kwota nie moze byc ujemna")
+    text = text.replace(" ","")
+    text = text.replace("_", "")
+    text = text.replace("'", "")
     text = text.replace(",", ".")
+    if text == '':
+        raise ValueError("Kwota nie moze być pusta.")
+    try:
+        test_text = float(text)
+    except ValueError:
+        raise ValueError("Kwota moze sie skladac tylko z liczb i separatorów.")
     dec = Decimal(text).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    return int(dec * 100)
+    if dec > 1000:
+        amount_big_value_check = input("Podano duzą liczbę, prosze potwierdzic(tak/nie): ")
+        if amount_big_value_check.lower == "tak":
+            return int(dec*100)
+        elif amount_big_value_check.lower == "nie":
+            raise ValueError("Podano za duzą wartość.")
     
 def cents_to_amount(cents: int) -> Decimal:
     return (Decimal(cents).scaleb(-2)).quantize(Decimal("0.00"),rounding=ROUND_HALF_UP)
@@ -138,10 +153,10 @@ def display_add_transaction():
         clear_terminal()
         amount = str(input("Podaj kwotę transakcji: "))
         try:
-            amount = amount_to_cents(amount)
+            amount = validate_amount(amount)
             break
-        except ValueError:
-            display_error("Podano kwotę w błędnym formacie.")
+        except ValueError as error:
+            display_error(error)
             continue
     clear_terminal()
     description = input("Podaj opis transakcji: ")
